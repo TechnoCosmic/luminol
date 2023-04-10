@@ -166,11 +166,11 @@ async function addCmd_ExtractFunction(context: vscode.ExtensionContext) {
             editBuilder.insert(editor.document.lineAt(editor.document.lineCount - 1).range.end,
                 '\n\n' + funcSig + '() {\n' + selectedText + '}\n');
         }).then(() => {
-            const newPosition = new vscode.Position(editor.document.lineCount - lineCount - 2, 0);
-            const newPosition2 = new vscode.Position(editor.document.lineCount - lineCount - 2, funcSig.length);
-            const newSelection = new vscode.Selection(newPosition, newPosition2);
+            const newStart = new vscode.Position(editor.document.lineCount - lineCount - 2, 0);
+            const newEnd = new vscode.Position(editor.document.lineCount - lineCount - 2, funcSig.length);
+            const newSelection = new vscode.Selection(newStart, newEnd);
             editor.selection = newSelection;
-            editor.revealRange(new vscode.Range(newPosition, newPosition), vscode.TextEditorRevealType.InCenter);
+            editor.revealRange(new vscode.Range(newStart, newStart), vscode.TextEditorRevealType.InCenter);
         });
     });
 
