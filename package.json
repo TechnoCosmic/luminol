@@ -2,19 +2,44 @@
     "name": "luminol",
     "displayName": "Luminol",
     "description": "Code highlighter",
-    "version": "0.0.1",
+    "author": "Dirk Mahoney",
+    "publisher": "Techno Cosmic Research Institute",
+    "version": "0.0.2",
     "engines": {
-        "vscode": "^1.69.0"
+        "vscode": "^1.77.0"
     },
     "categories": [
         "Other"
     ],
     "main": "./out/extension.js",
+    "activationEvents": [],
     "contributes": {
+        "configuration": {
+            "title": "Luminol",
+            "properties": {
+                "luminol.highlightColor": {
+                    "type": "string",
+                    "default": "#00FF00",
+                    "description": "The highlight color for Luminol"
+                }
+            }
+        },
         "commands": [
             {
                 "command": "luminol.clearLine",
                 "title": "Luminol: Clear Current Line"
+            },
+            {
+                "command": "luminol.toggleHighlight",
+                "title": "Luminol: Toggle Highlights"
+            },
+            {
+                "command": "luminol.highlightSelection",
+                "title": "Luminol: Highlight Selection"
+            },
+            {
+                "command": "luminol.clearHighlights",
+                "title": "Luminol: Clear Highlights"
             },
             {
                 "command": "luminol.extractFunction",
@@ -31,7 +56,7 @@
         "test": "node ./out/test/runTest.js"
     },
     "devDependencies": {
-        "@types/vscode": "^1.69.0",
+        "@types/vscode": "^1.77.0",
         "@types/glob": "^7.2.0",
         "@types/mocha": "^9.1.1",
         "@types/node": "16.x",
