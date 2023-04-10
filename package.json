@@ -4,7 +4,7 @@
     "description": "Code highlighter",
     "author": "Dirk Mahoney",
     "publisher": "Techno Cosmic Research Institute",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "engines": {
         "vscode": "^1.77.0"
     },
@@ -20,7 +20,17 @@
                 "luminol.highlightColor": {
                     "type": "string",
                     "default": "#00FF00",
-                    "description": "The highlight color for Luminol"
+                    "description": "The highlight color for matching strings"
+                },
+                "luminol.dimColor": {
+                    "type": "string",
+                    "default": "#606060",
+                    "description": "The color for non-matching strings"
+                },
+                "luminol.selectMatching": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Select all matching strings as well as highlighting them"
                 }
             }
         },

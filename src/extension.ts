@@ -7,6 +7,7 @@ import { TextEditorDecorationType } from 'vscode';
 let highlight: TextEditorDecorationType;
 let dim: TextEditorDecorationType;
 let highlightOn: boolean = false;
+let origSelection: vscode.Selection;
 
 
 function setupDecorations() {
@@ -14,13 +15,14 @@ function setupDecorations() {
 
     const config = vscode.workspace.getConfiguration('luminol');
     const hCol = config.get('highlightColor', '#00FF00');
+    const dCol = config.get('dimColor', '#606060');
 
     highlight = vscode.window.createTextEditorDecorationType({
         color: hCol,
     });
 
     dim = vscode.window.createTextEditorDecorationType({
-        color: '#606060',
+        color: dCol,
     });
 
     highlightOn = true;
@@ -29,9 +31,21 @@ function setupDecorations() {
 
 function clearHighlights() {
     if (!highlightOn) return;
+
     highlight.dispose();
     dim.dispose();
+
     highlightOn = false;
+
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return;
+
+    const config = vscode.workspace.getConfiguration('luminol');
+    const selectMatching = config.get('selectMatching', false);
+
+    if (selectMatching) {
+        editor.selection = origSelection;
+    }
 }
 
 
@@ -68,11 +82,21 @@ function highlightAllOccurrences(word: string): void {
     const matchDecorations: vscode.DecorationOptions[] = [];
     let match;
 
+    origSelection = editor.selection;
+
+    const config = vscode.workspace.getConfiguration('luminol');
+    const selectMatching = config.get('selectMatching', false);
+
     while ((match = pattern.exec(text))) {
         const startPos = editor.document.positionAt(match.index);
         const endPos = editor.document.positionAt(match.index + match[0].length);
         const decoration = { range: new vscode.Range(startPos, endPos) };
         matchDecorations.push(decoration);
+
+        if (selectMatching) {
+            const sel = new vscode.Selection(startPos, endPos);
+            editor.selections = editor.selections.concat(sel);
+        }
     }
 
     const lastLine = editor.document.lineAt(editor.document.lineCount - 1);
