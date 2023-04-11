@@ -1,7 +1,7 @@
 {
     "name": "luminol",
     "displayName": "Luminol",
-    "description": "Code highlighter",
+    "description": "Code Highlighter",
     "author": "Dirk Mahoney",
     "publisher": "Techno Cosmic Research Institute",
     "version": "0.0.4",
@@ -9,14 +9,23 @@
         "vscode": "^1.77.0"
     },
     "categories": [
+        "Formatters",
+        "Themes",
         "Other"
     ],
+    "activationEvents": [
+        "activate"
+    ],
     "main": "./out/extension.js",
-    "activationEvents": [],
     "contributes": {
         "configuration": {
             "title": "Luminol",
             "properties": {
+                "luminol.soleHighlightColor": {
+                    "type": "string",
+                    "default": "#FF8000",
+                    "description": "The highlight color for the sole matching string"
+                },
                 "luminol.highlightColor": {
                     "type": "string",
                     "default": "#00FF00",
@@ -36,10 +45,6 @@
         },
         "commands": [
             {
-                "command": "luminol.clearLine",
-                "title": "Luminol: Clear Current Line"
-            },
-            {
                 "command": "luminol.toggleHighlight",
                 "title": "Luminol: Toggle Highlights"
             },
@@ -52,8 +57,21 @@
                 "title": "Luminol: Clear Highlights"
             },
             {
+                "command": "luminol.movePrevMatch",
+                "title": "Luminol: Move to Previous Match"
+            },
+            {
+                "command": "luminol.moveNextMatch",
+                "title": "Luminol: Move to Next Match"
+            },
+
+            {
                 "command": "luminol.extractFunction",
                 "title": "Luminol: Extract Function"
+            },
+            {
+                "command": "luminol.clearLine",
+                "title": "Luminol: Clear Current Line"
             }
         ]
     },
