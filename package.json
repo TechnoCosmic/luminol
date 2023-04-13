@@ -1,10 +1,11 @@
 {
     "name": "luminol",
     "displayName": "Luminol",
-    "description": "Code Highlighter",
+    "description": "Code Highlighter/Navigator",
     "author": "Dirk Mahoney",
-    "publisher": "Techno Cosmic Research Institute",
-    "version": "0.0.4",
+    "publisher": "Dirk Mahoney",
+    "version": "1.0.0",
+    "icon": "images/icon.png",
     "engines": {
         "vscode": "^1.77.0"
     },
@@ -21,11 +22,6 @@
         "configuration": {
             "title": "Luminol",
             "properties": {
-                "luminol.soleHighlightColor": {
-                    "type": "string",
-                    "default": "#FF8000",
-                    "description": "The highlight color for the sole matching string"
-                },
                 "luminol.highlightColor": {
                     "type": "string",
                     "default": "#00FF00",
@@ -36,10 +32,10 @@
                     "default": "#606060",
                     "description": "The color for non-matching strings"
                 },
-                "luminol.selectMatching": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Select all matching strings as well as highlighting them"
+                "luminol.soleHighlightColor": {
+                    "type": "string",
+                    "default": "#FF8000",
+                    "description": "The highlight color for the sole matching string"
                 }
             }
         },
@@ -49,8 +45,8 @@
                 "title": "Luminol: Toggle Highlights"
             },
             {
-                "command": "luminol.highlightSelection",
-                "title": "Luminol: Highlight Selection"
+                "command": "luminol.selectHighlighted",
+                "title": "Luminol: Highlight and Select"
             },
             {
                 "command": "luminol.clearHighlights",
@@ -58,20 +54,11 @@
             },
             {
                 "command": "luminol.movePrevMatch",
-                "title": "Luminol: Move to Previous Match"
+                "title": "Luminol: Move to Previous"
             },
             {
                 "command": "luminol.moveNextMatch",
-                "title": "Luminol: Move to Next Match"
-            },
-
-            {
-                "command": "luminol.extractFunction",
-                "title": "Luminol: Extract Function"
-            },
-            {
-                "command": "luminol.clearLine",
-                "title": "Luminol: Clear Current Line"
+                "title": "Luminol: Move to Next"
             }
         ]
     },

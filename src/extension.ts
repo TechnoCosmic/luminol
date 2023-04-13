@@ -1,18 +1,48 @@
 import * as vscode from 'vscode';
 import { TextEditorDecorationType } from 'vscode';
-// import {networkInterfaces} from 'os';
-// const Net = require('net');
 
 
 let soleHighlight: TextEditorDecorationType;
 let highlight: TextEditorDecorationType;
 let dim: TextEditorDecorationType;
 let highlightOn: boolean = false;
-let origSelection: vscode.Selection;
 let matchRanges: vscode.DecorationOptions[] = [];
 let matchCount = 0;
 let curIndex = -1;
 let statusBarItem: vscode.StatusBarItem;
+let suppressNextSelectionChange: boolean = false;
+let selectionHandler: vscode.Disposable;
+
+
+function registerSelectionHandler() {
+    selectionHandler = vscode.window.onDidChangeTextEditorSelection(event => {
+        if (!suppressNextSelectionChange) {
+            clearHighlights();
+        }
+
+        suppressNextSelectionChange = false;
+    });
+}
+
+
+async function selectHighlights() {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) { return; }
+    if (matchCount === 0) { return; }
+    if (!highlightOn) { return; }
+
+    let selections: vscode.Selection[] = [];
+    await selectionHandler.dispose();
+
+    for (let i: number = 0; i < matchCount; ++i) {
+        const sel = new vscode.Selection(matchRanges[i].range.start, matchRanges[i].range.end);
+        selections = selections.concat(sel);
+    }
+
+    editor.selections = selections;
+    suppressNextSelectionChange = true;
+    registerSelectionHandler();
+}
 
 
 function setupHighlightDecorations() {
@@ -39,29 +69,19 @@ function setupHighlightDecorations() {
 }
 
 
-function clearHighlights() {
+async function clearHighlights() {
     if (!highlightOn) { return; }
 
     soleHighlight.dispose();
     highlight.dispose();
     dim.dispose();
+    await selectionHandler.dispose();
 
     matchCount = 0;
     matchRanges = [];
     curIndex = -1;
 
     highlightOn = false;
-
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) { return; }
-
-    const config = vscode.workspace.getConfiguration('luminol');
-    const selectMatching = config.get('selectMatching', false);
-
-    if (selectMatching) {
-        editor.selection = origSelection;
-    }
-
     statusBarItem.hide();
 }
 
@@ -75,7 +95,7 @@ function highlightSelection() {
     const selectedText = document.getText(selection);
 
     if (selectedText.length) {
-        highlightAllOccurrences(selectedText);
+        highlightAllOccurrences(selectedText, false);
         return;
     }
 
@@ -86,27 +106,35 @@ function highlightSelection() {
         return;
     }
 
-    highlightAllOccurrences(document.getText(range));
+    highlightAllOccurrences(document.getText(range), true);
     highlightOn = true;
     return;
 }
 
 
-function highlightAllOccurrences(word: string): void {
+function escapeRegExp(str: string) {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
+
+
+function highlightAllOccurrences(word: string, wholeWordOnly: boolean): void {
     const editor = vscode.window.activeTextEditor;
     if (!editor) { return; }
 
     clearHighlights();
     setupHighlightDecorations();
 
+    const escWord: string = escapeRegExp(word);
     const text = editor.document.getText();
-    const pattern = new RegExp(`\\b${word}\\b`, 'g');
+    let pattern;
     let match;
 
-    origSelection = editor.selection;
-
-    const config = vscode.workspace.getConfiguration('luminol');
-    const selectMatching = config.get('selectMatching', false);
+    if (wholeWordOnly) {
+        pattern = new RegExp(`\\b${escWord}\\b`, 'g');
+    }
+    else {
+        pattern = new RegExp(escWord, 'g');
+    }
 
     matchRanges = [];
     matchCount = 0;
@@ -121,10 +149,6 @@ function highlightAllOccurrences(word: string): void {
 
         if (curRange !== undefined && curRange !== null && decoration.range.contains(curRange.start)) {
             curIndex = matchCount;
-        }
-
-        if (selectMatching) {
-            editor.selections = editor.selections.concat(new vscode.Selection(startPos, endPos));
         }
 
         ++matchCount;
@@ -147,13 +171,22 @@ function highlightAllOccurrences(word: string): void {
     const lineSpan = lineEnd - lineStart + 1;
     statusBarItem.text = matchCount + " matches, spanning " + lineSpan + " lines";
     statusBarItem.show();
+
+    registerSelectionHandler();
 }
 
 
-async function createNewFile(txt: string) {
-    const newFile = await vscode.workspace.openTextDocument({ content: txt });
-    await vscode.window.showTextDocument(newFile);
-}
+async function addCmdSelectHighlights(context: vscode.ExtensionContext) {
+    let cmd = vscode.commands.registerCommand('luminol.selectHighlighted', () => {
+        if (!highlightOn) {
+            highlightSelection();
+        }
+
+        selectHighlights();
+    });
+
+    context.subscriptions.push(cmd);
+};
 
 
 async function addCmdClearHighlights(context: vscode.ExtensionContext) {
@@ -179,8 +212,11 @@ async function addCmdMovePrevMatch(context: vscode.ExtensionContext) {
             curIndex = (curIndex - 1) % matchCount;
         }
 
-        editor.selection = new vscode.Selection(matchRanges[curIndex].range.start, matchRanges[curIndex].range.end);
-        editor.revealRange(matchRanges[curIndex].range, vscode.TextEditorRevealType.InCenter);
+        if (matchCount > 1) {
+            suppressNextSelectionChange = true;
+            editor.selection = new vscode.Selection(matchRanges[curIndex].range.start, matchRanges[curIndex].range.end);
+            editor.revealRange(matchRanges[curIndex].range, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
+        }
     });
 
     context.subscriptions.push(cmd);
@@ -192,24 +228,18 @@ async function addCmdMoveNextMatch(context: vscode.ExtensionContext) {
         const editor = vscode.window.activeTextEditor;
         if (!editor) { return; }
 
-        if (matchCount === 0) {
+        if (!matchCount) {
             highlightSelection();
         }
         else {
             curIndex = (curIndex + 1) % matchCount;
         }
 
-        editor.selection = new vscode.Selection(matchRanges[curIndex].range.start, matchRanges[curIndex].range.end);
-        editor.revealRange(matchRanges[curIndex].range, vscode.TextEditorRevealType.InCenter);
-    });
-
-    context.subscriptions.push(cmd);
-};
-
-
-async function addCmdHighlightSelection(context: vscode.ExtensionContext) {
-    let cmd = vscode.commands.registerCommand('luminol.highlightSelection', () => {
-        highlightSelection();
+        if (matchCount > 1) {
+            suppressNextSelectionChange = true;
+            editor.selection = new vscode.Selection(matchRanges[curIndex].range.start, matchRanges[curIndex].range.end);
+            editor.revealRange(matchRanges[curIndex].range, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
+        }
     });
 
     context.subscriptions.push(cmd);
@@ -218,7 +248,7 @@ async function addCmdHighlightSelection(context: vscode.ExtensionContext) {
 
 async function addCmdToggleHighlight(context: vscode.ExtensionContext) {
     let cmd = vscode.commands.registerCommand('luminol.toggleHighlight', () => {
-        if (highlightOn === true) {
+        if (highlightOn) {
             clearHighlights();
         }
         else {
@@ -230,80 +260,14 @@ async function addCmdToggleHighlight(context: vscode.ExtensionContext) {
 };
 
 
-async function addCmdExtractFunction(context: vscode.ExtensionContext) {
-    let cmd = vscode.commands.registerCommand('luminol.extractFunction', () => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) { return; }
-
-        const selection = editor.selection;
-        const selectedText = editor.document.getText(selection);
-        if (selectedText.length === 0) { return; }
-
-        const startLine = selection.start.line;
-        const endLine = selection.end.line;
-        const lineCount = endLine - startLine + 1;
-
-        const funcSig = 'void newFunc';
-
-        editor.edit(editBuilder => {
-            editBuilder.delete(selection);
-            editBuilder.insert(editor.document.lineAt(editor.document.lineCount - 1).range.end,
-                '\n\n' + funcSig + '() {\n' + selectedText + '}\n');
-        }).then(() => {
-            const newStart = new vscode.Position(editor.document.lineCount - lineCount - 2, 0);
-            const newEnd = new vscode.Position(editor.document.lineCount - lineCount - 2, funcSig.length);
-            const newSelection = new vscode.Selection(newStart, newEnd);
-            editor.selection = newSelection;
-            editor.revealRange(new vscode.Range(newStart, newStart), vscode.TextEditorRevealType.InCenter);
-        });
-    });
-
-    context.subscriptions.push(cmd);
-}
-
-
-function addCmdClearCurrentLine(context: vscode.ExtensionContext) {
-    let cmd = vscode.commands.registerCommand('luminol.clearLine', () => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) { return; }
-
-        const document = editor.document;
-        const selection = editor.selection;
-        const activeLine = selection.active.line;
-        const lineText = document.lineAt(activeLine).text;
-
-        const leadingWhitespaceMatch = lineText.match(/^\s*/);
-        const leadingWhitespace = leadingWhitespaceMatch ? leadingWhitespaceMatch[0] : '';
-
-        // Delete the current line
-        editor
-            .edit((editBuilder) => {
-                editBuilder.delete(document.lineAt(activeLine).range);
-            })
-            .then(() => {
-                // Insert a new blank line at the same position
-                editor.edit((editBuilder) => {
-                    const position = new vscode.Position(activeLine, 0);
-                    editBuilder.insert(position, leadingWhitespace);
-                });
-            });
-    });
-
-    context.subscriptions.push(cmd);
-}
-
-
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
     addCmdToggleHighlight(context);
-    addCmdHighlightSelection(context);
+    addCmdSelectHighlights(context);
     addCmdClearHighlights(context);
     addCmdMovePrevMatch(context);
     addCmdMoveNextMatch(context);
-
-    addCmdExtractFunction(context);
-    addCmdClearCurrentLine(context);
 
     statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
 }
