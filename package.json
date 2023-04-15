@@ -14,9 +14,7 @@
         "Themes",
         "Other"
     ],
-    "activationEvents": [
-        "activate"
-    ],
+    "activationEvents": [],
     "main": "./out/extension.js",
     "contributes": {
         "configuration": {

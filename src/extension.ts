@@ -269,7 +269,7 @@ export function activate(context: vscode.ExtensionContext) {
     addCmdMovePrevMatch(context);
     addCmdMoveNextMatch(context);
 
-    statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 100);
+    statusBarItem = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right);
 }
 
 
