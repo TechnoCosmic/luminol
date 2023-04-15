@@ -2,6 +2,8 @@
 
 ## Features
 
+![Screenshot](images/screenshot.jpg)
+
 - Quick file-based highlighting, navigation, and selection
 - That's it!
 

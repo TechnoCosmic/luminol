@@ -3,14 +3,13 @@
     "displayName": "Luminol",
     "description": "Code Highlighter/Navigator",
     "author": "Dirk Mahoney",
-    "publisher": "Dirk Mahoney",
+    "publisher": "tcri",
     "version": "1.0.0",
     "icon": "images/icon.png",
     "engines": {
         "vscode": "^1.77.0"
     },
     "categories": [
-        "Formatters",
         "Themes",
         "Other"
     ],
