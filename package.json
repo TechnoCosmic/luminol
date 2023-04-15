@@ -13,6 +13,10 @@
         "Themes",
         "Other"
     ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/technocosmic/luminol.git"
+    },
     "activationEvents": [],
     "main": "./out/extension.js",
     "contributes": {
