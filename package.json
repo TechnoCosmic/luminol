@@ -1,18 +1,29 @@
 {
     "name": "luminol",
     "displayName": "Luminol",
-    "description": "Code Highlighter/Navigator",
+    "description": "Quickly highlight, select, and navigate text.",
     "author": "Dirk Mahoney",
     "publisher": "tcri",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "icon": "images/icon.png",
     "engines": {
         "vscode": "^1.77.0"
     },
     "categories": [
-        "Themes",
+        "Programming Languages",
         "Other"
     ],
+    "keywords": [
+        "highlight",
+        "navigate",
+        "select",
+        "find",
+        "search"
+    ],
+    "galleryBanner": {
+        "color": "#040404",
+        "theme": "dark"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/technocosmic/luminol.git"
