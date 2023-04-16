@@ -1,10 +1,9 @@
 import * as vscode from 'vscode';
-import { TextEditorDecorationType } from 'vscode';
 
 
-let soleHighlight: TextEditorDecorationType;
-let highlight: TextEditorDecorationType;
-let dim: TextEditorDecorationType;
+let soleHighlight: vscode.TextEditorDecorationType;
+let highlight: vscode.TextEditorDecorationType;
+let dim: vscode.TextEditorDecorationType;
 let highlightOn: boolean = false;
 let matchRanges: vscode.DecorationOptions[] = [];
 let matchCount = 0;
