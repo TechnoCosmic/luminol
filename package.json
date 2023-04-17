@@ -4,7 +4,7 @@
     "description": "Quickly highlight, select, and navigate text.",
     "author": "Dirk Mahoney",
     "publisher": "tcri",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "icon": "images/icon.png",
     "engines": {
         "vscode": "^1.77.0"
@@ -31,26 +31,32 @@
     "activationEvents": [],
     "main": "./out/extension.js",
     "contributes": {
-        "configuration": {
-            "title": "Luminol",
-            "properties": {
-                "luminol.highlightColor": {
-                    "type": "string",
-                    "default": "#00FF00",
-                    "description": "The highlight color for matching strings"
-                },
-                "luminol.dimColor": {
-                    "type": "string",
-                    "default": "#606060",
-                    "description": "The color for non-matching strings"
-                },
-                "luminol.soleHighlightColor": {
-                    "type": "string",
-                    "default": "#FF8000",
-                    "description": "The highlight color for the sole matching string"
+        "colors": [
+            {
+                "id": "luminol.highlightColor",
+                "description": "The color used to highlight matching text",
+                "defaults": {
+                    "dark": "#00FF00",
+                    "light": "#008000"
+                }
+            },
+            {
+                "id": "luminol.soleHighlightColor",
+                "description": "The color used to highlight text when it's the only occurrence in the file",
+                "defaults": {
+                    "dark": "#FF8000",
+                    "light": "#FF8000"
+                }
+            },
+            {
+                "id": "luminol.dimColor",
+                "description": "The color used for all non-matching text",
+                "defaults": {
+                    "dark": "#606060",
+                    "light": "#808080"
                 }
             }
-        },
+        ],
         "commands": [
             {
                 "command": "luminol.toggleHighlight",

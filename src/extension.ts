@@ -47,21 +47,16 @@ async function selectHighlights() {
 function setupHighlightDecorations() {
     if (highlightOn) { return; }
 
-    const config = vscode.workspace.getConfiguration('luminol');
-    const hCol = config.get('highlightColor', '#00FF00');
-    const sCol = config.get('soleHighlightColor', '#FF8000');
-    const dCol = config.get('dimColor', '#606060');
-
     soleHighlight = vscode.window.createTextEditorDecorationType({
-        color: sCol,
+        color: new vscode.ThemeColor('luminol.soleHighlightColor'),
     });
 
     highlight = vscode.window.createTextEditorDecorationType({
-        color: hCol,
+        color: new vscode.ThemeColor('luminol.highlightColor'),
     });
 
     dim = vscode.window.createTextEditorDecorationType({
-        color: dCol,
+        color: new vscode.ThemeColor('luminol.dimColor'),
     });
 
     highlightOn = true;

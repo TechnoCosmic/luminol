@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.3]
+
+- Color settings done properly
+
 ## [1.0.2]
 
 - Fix for package.json

@@ -35,6 +35,10 @@ Requirements
 
 ## Release Notes
 
+### 1.0.3
+
+- Color settings done properly
+
 ### 1.0.0
 
 - Initial release
