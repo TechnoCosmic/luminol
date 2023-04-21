@@ -48,15 +48,21 @@ function setupHighlightDecorations() {
     if (highlightOn) { return; }
 
     soleHighlight = vscode.window.createTextEditorDecorationType({
+        opacity: "1",
         color: new vscode.ThemeColor('luminol.soleHighlightColor'),
     });
 
     highlight = vscode.window.createTextEditorDecorationType({
+        opacity: "1",
         color: new vscode.ThemeColor('luminol.highlightColor'),
     });
 
+    const config = vscode.workspace.getConfiguration('luminol');
+    const opac: number = config.get<number>('dimOpacity', 0.5);
+    const str: string = opac.toString();
+
     dim = vscode.window.createTextEditorDecorationType({
-        color: new vscode.ThemeColor('luminol.dimColor'),
+        opacity: str,
     });
 
     highlightOn = true;

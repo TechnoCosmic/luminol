@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.4]
+
+- Replaced dimColor with dimOpacity, because sexier
+
 ## [1.0.3]
 
 - Color settings done properly

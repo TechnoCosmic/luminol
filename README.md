@@ -2,10 +2,10 @@
 
 ## Features
 
-![Screenshot](images/screenshot.jpg)
-
 - Quick file-based highlighting, navigation, and selection
 - That's it!
+
+![Screenshot](images/screenshot.jpg)
 
 Place the cursor on a keyword and use `Luminol: Toggle Highlights` (from the command palette, or assign yourself a keybinding) - all full-word matches will be highlighted and everything else goes dim. Select a section of text instead and partial matches will be included.
 
@@ -27,13 +27,17 @@ Requirements
 
 - `luminol.soleHighlightColor`: The color for the highlight when the selection is unique in the file.
 
-- `luminol.dimColor`: The color for everything else that doesn't match.
+- `luminol.dimOpacity`: The 0-1 'dimmed' opacity for non-matching text.
 
 ## Known Issues
 
 - None. Yet.
 
 ## Release Notes
+
+### 1.0.4
+
+- Replaced `dimColor` with `dimOpacity`, because sexier
 
 ### 1.0.3
 
