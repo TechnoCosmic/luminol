@@ -217,35 +217,46 @@ async function addCmdClearHighlights(context: vscode.ExtensionContext) {
 };
 
 
-async function addCmdMovePrevMatch(context: vscode.ExtensionContext) {
-    let cmd = vscode.commands.registerCommand('luminol.movePrevMatch', () => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) return;
+function selectHighlight(index: number) {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) return;
 
-        if (matchCount === 0) {
-            const { document } = editor;
-            const curIsRange: boolean = document.getText(editor.selection).length > 0;
+    if (matchCount === 0) {
+        const { document } = editor;
+        const curIsRange: boolean = document.getText(editor.selection).length > 0;
 
-            highlightSelection();
+        highlightSelection();
 
-            if (!curIsRange) {
-                suppressNextSelectionChange = true;
-                editor.selection = new vscode.Selection(matchRanges[curIndex].range.start, matchRanges[curIndex].range.end);
-            }
-
-            return;
-        }
-        else if (curIndex <= 0) {
-            curIndex = matchCount - 1;
-        } else {
-            curIndex = (curIndex - 1) % matchCount;
-        }
-
-        if (matchCount > 1) {
+        if (!curIsRange) {
             suppressNextSelectionChange = true;
             editor.selection = new vscode.Selection(matchRanges[curIndex].range.start, matchRanges[curIndex].range.end);
-            editor.revealRange(matchRanges[curIndex].range, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
         }
+
+        return;
+    }
+
+    curIndex = index;
+
+    if (matchCount > 1) {
+        suppressNextSelectionChange = true;
+        editor.selection = new vscode.Selection(matchRanges[curIndex].range.start, matchRanges[curIndex].range.end);
+        editor.revealRange(matchRanges[curIndex].range, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
+    }
+}
+
+
+async function addCmdMovePrevMatch(context: vscode.ExtensionContext) {
+    let cmd = vscode.commands.registerCommand('luminol.movePrevMatch', () => {
+        let nextIndex: number = 0;
+
+        if (curIndex <= 0) {
+            nextIndex = matchCount - 1;
+        } else {
+            nextIndex = (curIndex - 1) % matchCount;
+        }
+
+        selectHighlight(nextIndex);
+
     });
 
     context.subscriptions.push(cmd);
@@ -254,31 +265,7 @@ async function addCmdMovePrevMatch(context: vscode.ExtensionContext) {
 
 async function addCmdMoveNextMatch(context: vscode.ExtensionContext) {
     let cmd = vscode.commands.registerCommand('luminol.moveNextMatch', () => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) return;
-
-        if (matchCount === 0) {
-            const { document } = editor;
-            const curIsRange: boolean = document.getText(editor.selection).length > 0;
-
-            highlightSelection();
-
-            if (!curIsRange) {
-                suppressNextSelectionChange = true;
-                editor.selection = new vscode.Selection(matchRanges[curIndex].range.start, matchRanges[curIndex].range.end);
-            }
-
-            return;
-        }
-        else {
-            curIndex = (curIndex + 1) % matchCount;
-        }
-
-        if (matchCount > 1) {
-            suppressNextSelectionChange = true;
-            editor.selection = new vscode.Selection(matchRanges[curIndex].range.start, matchRanges[curIndex].range.end);
-            editor.revealRange(matchRanges[curIndex].range, vscode.TextEditorRevealType.InCenterIfOutsideViewport);
-        }
+        selectHighlight((curIndex + 1) % matchCount);
     });
 
     context.subscriptions.push(cmd);
