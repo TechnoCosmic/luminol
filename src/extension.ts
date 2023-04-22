@@ -27,9 +27,9 @@ function registerSelectionHandler() {
 
 async function selectHighlights() {
     const editor = vscode.window.activeTextEditor;
-    if (!editor) { return; }
-    if (matchCount === 0) { return; }
-    if (!highlightOn) { return; }
+    if (!editor) return;
+    if (matchCount === 0) return;
+    if (!highlightOn) return;
 
     let selections: vscode.Selection[] = [];
     await selectionHandler.dispose();
@@ -46,11 +46,11 @@ async function selectHighlights() {
 
 
 function setupHighlightDecorations() {
-    if (highlightOn) { return; }
+    if (highlightOn) return;
 
     rulerHighlight = vscode.window.createTextEditorDecorationType({
         overviewRulerColor: new vscode.ThemeColor('luminol.highlightColor'),
-        overviewRulerLane: vscode.OverviewRulerLane.Full,
+        overviewRulerLane: vscode.OverviewRulerLane.Center,
     });
 
     soleHighlight = vscode.window.createTextEditorDecorationType({
@@ -76,7 +76,7 @@ function setupHighlightDecorations() {
 
 
 async function clearHighlights() {
-    if (!highlightOn) { return; }
+    if (!highlightOn) return;
 
     rulerHighlight.dispose();
     soleHighlight.dispose();
@@ -97,10 +97,10 @@ async function clearHighlights() {
 
 function highlightSelection() {
     const editor = vscode.window.activeTextEditor;
-    if (!editor) { return; }
+    if (!editor) return;
 
-    const document = editor.document;
-    const selection = editor.selection;
+    const { document } = editor;
+    const { selection } = editor;
     const selectedText = document.getText(selection);
 
     if (selectedText.length) {
@@ -128,13 +128,15 @@ function escapeRegExp(str: string) {
 
 function highlightAllOccurrences(word: string, wholeWordOnly: boolean): void {
     const editor = vscode.window.activeTextEditor;
-    if (!editor) { return; }
+    if (!editor) return;
+
+    const { document } = editor;
 
     clearHighlights();
     setupHighlightDecorations();
 
     const escWord: string = escapeRegExp(word);
-    const text = editor.document.getText();
+    const text = document.getText();
     let pattern;
     let match;
 
@@ -149,15 +151,15 @@ function highlightAllOccurrences(word: string, wholeWordOnly: boolean): void {
     matchRanges = [];
     matchCount = 0;
 
-    const curRange = editor.document.getWordRangeAtPosition(editor.selection.active);
+    const curRange = document.getWordRangeAtPosition(editor.selection.active);
 
     while ((match = pattern.exec(text))) {
-        const startPos = editor.document.positionAt(match.index);
-        const endPos = editor.document.positionAt(match.index + match[0].length);
+        const startPos = document.positionAt(match.index);
+        const endPos = document.positionAt(match.index + match[0].length);
         const decoration = { range: new vscode.Range(startPos, endPos) };
         matchRanges.push(decoration);
 
-        const overviewDeco = { range: editor.document.lineAt(decoration.range.start.line).range };
+        const overviewDeco = { range: document.lineAt(decoration.range.start.line).range };
         overviewDecos.push(overviewDeco);
 
         if (curRange !== undefined && curRange !== null && decoration.range.contains(curRange.start)) {
@@ -167,7 +169,7 @@ function highlightAllOccurrences(word: string, wholeWordOnly: boolean): void {
         ++matchCount;
     }
 
-    const lastLine = editor.document.lineAt(editor.document.lineCount - 1);
+    const lastLine = document.lineAt(document.lineCount - 1);
     const entireRange = new vscode.Range(0, 0, lastLine.lineNumber, lastLine.range.end.character);
 
     editor.setDecorations(dim, [entireRange]);
@@ -181,9 +183,10 @@ function highlightAllOccurrences(word: string, wholeWordOnly: boolean): void {
 
     editor.setDecorations(rulerHighlight, overviewDecos);
 
-    const lineStart: number = editor.document.lineAt(matchRanges[0].range.start).lineNumber;
-    const lineEnd: number = editor.document.lineAt(matchRanges[matchCount - 1].range.end).lineNumber;
+    const lineStart: number = document.lineAt(matchRanges[0].range.start).lineNumber;
+    const lineEnd: number = document.lineAt(matchRanges[matchCount - 1].range.end).lineNumber;
     const lineSpan = lineEnd - lineStart + 1;
+
     statusBarItem.text = matchCount + " matches, spanning " + lineSpan + " lines";
     statusBarItem.show();
 
@@ -216,7 +219,7 @@ async function addCmdClearHighlights(context: vscode.ExtensionContext) {
 async function addCmdMovePrevMatch(context: vscode.ExtensionContext) {
     let cmd = vscode.commands.registerCommand('luminol.movePrevMatch', () => {
         const editor = vscode.window.activeTextEditor;
-        if (!editor) { return; }
+        if (!editor) return;
 
         if (matchCount === 0) {
             highlightSelection();
@@ -241,7 +244,7 @@ async function addCmdMovePrevMatch(context: vscode.ExtensionContext) {
 async function addCmdMoveNextMatch(context: vscode.ExtensionContext) {
     let cmd = vscode.commands.registerCommand('luminol.moveNextMatch', () => {
         const editor = vscode.window.activeTextEditor;
-        if (!editor) { return; }
+        if (!editor) return;
 
         if (!matchCount) {
             highlightSelection();
