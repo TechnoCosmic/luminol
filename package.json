@@ -55,6 +55,8 @@
                 "luminol.dimOpacity": {
                     "type": "number",
                     "default": 0.5,
+                    "minimum": 0.0,
+                    "maximum": 1.0,
                     "description": "The opacity for non-matching text"
                 }
             }
