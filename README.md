@@ -35,6 +35,10 @@ Requirements
 
 ## Release Notes
 
+### 1.0.7
+
+- Bug fix for partial matching and not clearing decorations correctly first time
+
 ### 1.0.5
 
 - Added markers to the overview ruler for a better... overview
