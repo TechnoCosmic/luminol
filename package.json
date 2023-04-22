@@ -62,23 +62,28 @@
         "commands": [
             {
                 "command": "luminol.toggleHighlight",
-                "title": "Luminol: Toggle Highlights"
+                "title": "Toggle Highlights",
+                "category": "Luminol"
             },
             {
                 "command": "luminol.selectHighlighted",
-                "title": "Luminol: Highlight and Select"
+                "title": "Highlight and Select",
+                "category": "Luminol"
             },
             {
                 "command": "luminol.clearHighlights",
-                "title": "Luminol: Clear Highlights"
+                "title": "Clear Highlights",
+                "category": "Luminol"
             },
             {
                 "command": "luminol.movePrevMatch",
-                "title": "Luminol: Move to Previous"
+                "title": "Move to Previous",
+                "category": "Luminol"
             },
             {
                 "command": "luminol.moveNextMatch",
-                "title": "Luminol: Move to Next"
+                "title": "Move to Next",
+                "category": "Luminol"
             }
         ]
     },
