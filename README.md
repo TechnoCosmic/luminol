@@ -35,6 +35,10 @@ Requirements
 
 ## Release Notes
 
+### 1.0.5
+
+- Added markers to the overview ruler for a better... overview
+
 ### 1.0.4
 
 - Replaced `dimColor` with `dimOpacity`, because sexier

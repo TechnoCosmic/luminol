@@ -1,11 +1,12 @@
 import * as vscode from 'vscode';
 
-
+let rulerHighlight: vscode.TextEditorDecorationType;
 let soleHighlight: vscode.TextEditorDecorationType;
 let highlight: vscode.TextEditorDecorationType;
 let dim: vscode.TextEditorDecorationType;
-let highlightOn: boolean = false;
 let matchRanges: vscode.DecorationOptions[] = [];
+let overviewDecos: vscode.DecorationOptions[] = [];
+let highlightOn: boolean = false;
 let matchCount = 0;
 let curIndex = -1;
 let statusBarItem: vscode.StatusBarItem;
@@ -47,6 +48,11 @@ async function selectHighlights() {
 function setupHighlightDecorations() {
     if (highlightOn) { return; }
 
+    rulerHighlight = vscode.window.createTextEditorDecorationType({
+        overviewRulerColor: new vscode.ThemeColor('luminol.highlightColor'),
+        overviewRulerLane: vscode.OverviewRulerLane.Full,
+    });
+
     soleHighlight = vscode.window.createTextEditorDecorationType({
         opacity: "1",
         color: new vscode.ThemeColor('luminol.soleHighlightColor'),
@@ -72,6 +78,7 @@ function setupHighlightDecorations() {
 async function clearHighlights() {
     if (!highlightOn) { return; }
 
+    rulerHighlight.dispose();
     soleHighlight.dispose();
     highlight.dispose();
     dim.dispose();
@@ -79,6 +86,8 @@ async function clearHighlights() {
 
     matchCount = 0;
     matchRanges = [];
+    overviewDecos = [];
+
     curIndex = -1;
 
     highlightOn = false;
@@ -136,6 +145,7 @@ function highlightAllOccurrences(word: string, wholeWordOnly: boolean): void {
         pattern = new RegExp(escWord, 'g');
     }
 
+    overviewDecos = [];
     matchRanges = [];
     matchCount = 0;
 
@@ -146,6 +156,9 @@ function highlightAllOccurrences(word: string, wholeWordOnly: boolean): void {
         const endPos = editor.document.positionAt(match.index + match[0].length);
         const decoration = { range: new vscode.Range(startPos, endPos) };
         matchRanges.push(decoration);
+
+        const overviewDeco = { range: editor.document.lineAt(decoration.range.start.line).range };
+        overviewDecos.push(overviewDeco);
 
         if (curRange !== undefined && curRange !== null && decoration.range.contains(curRange.start)) {
             curIndex = matchCount;
@@ -165,6 +178,8 @@ function highlightAllOccurrences(word: string, wholeWordOnly: boolean): void {
     else {
         editor.setDecorations(highlight, matchRanges);
     }
+
+    editor.setDecorations(rulerHighlight, overviewDecos);
 
     const lineStart: number = editor.document.lineAt(matchRanges[0].range.start).lineNumber;
     const lineEnd: number = editor.document.lineAt(matchRanges[matchCount - 1].range.end).lineNumber;
