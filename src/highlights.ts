@@ -163,7 +163,7 @@ function highlightAllOccurrences(word: string, wholeWordOnly: boolean): void {
         const overviewDeco = { range: document.lineAt(decoration.range.start.line).range };
         overviewDecos.push(overviewDeco);
 
-        if (curRange !== undefined && curRange !== null && decoration.range.contains(curRange.start)) {
+        if (curRange !== undefined && curRange !== null && (decoration.range.contains(curRange.start) || decoration.range.contains(curRange.end))) {
             curIndex = matchCount;
         }
 
@@ -223,7 +223,17 @@ async function addCmdMovePrevMatch(context: vscode.ExtensionContext) {
         if (!editor) return;
 
         if (matchCount === 0) {
+            const { document } = editor;
+            const curIsRange: boolean = document.getText(editor.selection).length > 0;
+
             highlightSelection();
+
+            if (!curIsRange) {
+                suppressNextSelectionChange = true;
+                editor.selection = new vscode.Selection(matchRanges[curIndex].range.start, matchRanges[curIndex].range.end);
+            }
+
+            return;
         }
         else if (curIndex <= 0) {
             curIndex = matchCount - 1;
@@ -247,8 +257,18 @@ async function addCmdMoveNextMatch(context: vscode.ExtensionContext) {
         const editor = vscode.window.activeTextEditor;
         if (!editor) return;
 
-        if (!matchCount) {
+        if (matchCount === 0) {
+            const { document } = editor;
+            const curIsRange: boolean = document.getText(editor.selection).length > 0;
+
             highlightSelection();
+
+            if (!curIsRange) {
+                suppressNextSelectionChange = true;
+                editor.selection = new vscode.Selection(matchRanges[curIndex].range.start, matchRanges[curIndex].range.end);
+            }
+
+            return;
         }
         else {
             curIndex = (curIndex + 1) % matchCount;
