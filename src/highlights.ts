@@ -286,7 +286,7 @@ async function addCmdToggleHighlight(context: vscode.ExtensionContext) {
 };
 
 
-export function registerCommands(context: vscode.ExtensionContext) {
+export function connect(context: vscode.ExtensionContext) {
     addCmdToggleHighlight(context);
     addCmdSelectHighlights(context);
     addCmdClearHighlights(context);

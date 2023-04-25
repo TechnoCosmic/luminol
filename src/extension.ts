@@ -3,7 +3,7 @@ import * as hl from './highlights';
 
 
 export function activate(context: vscode.ExtensionContext) {
-    hl.registerCommands(context);
+    hl.connect(context);
 }
 
 
