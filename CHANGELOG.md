@@ -1,5 +1,9 @@
 # Change Log
 
+## [1.0.8]
+
+- Bug fix for nothing-selected move next/prev issue
+
 ## [1.0.7]
 
 - Bug fix for partial matching and not clearing decorations correctly first time

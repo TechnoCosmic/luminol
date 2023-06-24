@@ -4,7 +4,7 @@
     "description": "Quickly highlight, select, and navigate text.",
     "author": "Dirk Mahoney",
     "publisher": "tcri",
-    "version": "1.0.7",
+    "version": "1.0.9",
     "icon": "images/icon.png",
     "engines": {
         "vscode": "^1.77.0"

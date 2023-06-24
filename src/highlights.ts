@@ -227,7 +227,7 @@ function selectHighlight(index: number) {
 
         highlightSelection();
 
-        if (!curIsRange) {
+        if (!curIsRange && curIndex >= 0) {
             suppressNextSelectionChange = true;
             editor.selection = new vscode.Selection(matchRanges[curIndex].range.start, matchRanges[curIndex].range.end);
         }
